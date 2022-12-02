@@ -1,0 +1,98 @@
+@startuml
+skinparam backgroundColor mintCream
+
+' autonumber
+
+
+participant OfflinePackageController
+
+participant WebView #LightBlue
+
+participant OfflinePackageURLProtocol
+
+participant KKJSBridgeEngine
+
+' participant KKJSBridgeAjaxURLProtocol
+
+
+
+OfflinePackageController -> WebView: packgeId 映射为url: https://{packageId}.package 加载请求
+OfflinePackageController -> KKJSBridgeEngine : 注入js脚本, 进行ajaxHook 
+
+WebView -> OfflinePackageURLProtocol : 拦截请求
+
+OfflinePackageURLProtocol -> OfflinePackageURLProtocol : 解析路径,判断是否离线包资源
+alt #LightGreen 离线包资源
+ OfflinePackageURLProtocol <-- OfflinePackageURLProtocol : 封装成NSURLResponse返回
+else #Pink 网络资源
+OfflinePackageURLProtocol-> NSURLSession : 创建session请求资源
+OfflinePackageURLProtocol <-- NSURLSession: 后返回
+end
+
+
+
+
+
+' participant PolicyEngine #LightCoral
+' participant PolicyManager #LightCoral
+' participant PolicyPopViewPresenter #LightCoral
+' participant SSLogbeatBaseView #LightCoral
+
+
+' User -> MpsClient:用户进入某个页面,\n触发reportPageEvent
+' MpsClient -> ProbeReporter: reportPageEvent
+
+' ProbeReporter -> AppLogSettingModel: matchPagePropertiesDic判断字段是否满足上报条件
+
+
+' note over ProbeReporter,AppLogSettingModel
+' 这里是第一次匹配,
+' 匹配成功会进行上报,
+' 失败则流程终止
+' end note
+
+' alt #LightGreen 匹配成功
+' ProbeReporter <-- AppLogSettingModel: return true
+' ProbeReporter -> AppLogSettingModel: getRealPageViewDic
+' ProbeReporter <-- AppLogSettingModel: return params
+' ProbeReporter -[#red]> ProbeClient: reportAction 上报事件
+' ProbeReporter -> MpsClient: onReceiveProbeData
+
+' MpsClient -> PolicyEngine: receiveProbeData 上报给本地匹配策略
+
+' PolicyEngine -> PolicyManager: matchActionmap
+' note over PolicyEngine, PolicyManager
+' 这里是第二次匹配,匹配成功会触发策略执行
+' 失败则流程终止,
+' 入参依赖step11的返回值.
+' end note
+' alt #LightGreen 匹配成功
+' PolicyEngine <-- PolicyManager : return UIActionModel
+' PolicyEngine -> PolicyEngine: postEventNotifition
+' PolicyEngine --> MpsClient: onPolicyReceived
+' MpsClient -[#red]> PushClient: triggerNotification, PushSDK上报
+' PolicyEngine -> PolicyPopViewPresenter: showLogViewWithProperties,弹窗视图展示
+
+' PolicyPopViewPresenter ->SSLogbeatBaseView : init
+' activate SSLogbeatBaseView
+
+' PolicyPopViewPresenter -> MpsClient : reportPageEvent 上报浮窗展示
+' MpsClient -[#red]> ProbeReporter:reportPageEvent 后续步骤同step2
+
+' User -> SSLogbeatBaseView : 用户点击 tapGoAciton
+' SSLogbeatBaseView -> MpsClient:reportClickEvent
+' MpsClient -[#red]> ProbeReporter:reportClickEvent 后续步骤同step2
+' SSLogbeatBaseView -> SSLogbeatBaseView:updateShowLogView 移除视图
+' deactivate SSLogbeatBaseView
+
+' else #Pink 匹配失败
+' autonumber 11
+' PolicyEngine <-- PolicyManager: return nil
+' end
+' else #Pink 匹配失败
+' autonumber 5
+' ProbeReporter <-- AppLogSettingModel: return false
+' end
+
+
+@enduml
