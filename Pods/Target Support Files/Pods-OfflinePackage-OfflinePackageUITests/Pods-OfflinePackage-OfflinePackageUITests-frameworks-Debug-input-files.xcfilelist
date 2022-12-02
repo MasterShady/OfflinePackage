@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-OfflinePackage-OfflinePackageUITests/Pods-OfflinePackage-OfflinePackageUITests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework
+${BUILT_PRODUCTS_DIR}/KKJSBridge/KKJSBridge.framework
+${BUILT_PRODUCTS_DIR}/WebViewJavascriptBridge/WebViewJavascriptBridge.framework
+${BUILT_PRODUCTS_DIR}/ZipArchive/ZipArchive.framework
