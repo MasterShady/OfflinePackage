@@ -5,13 +5,25 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask import render_template
 from datetime import timedelta
+from flask import url_for, redirect
 
 app = Flask(__name__, static_url_path='/static',static_folder='templates/static')
 CORS(app)
 
+@app.route("/redirct")
+def redirct():
+    return redirect(url_for('index'), 302)
+
 @app.route("/")
 def index():
+    print("get cookie from server!")
+    print(request.cookies)
     return render_template('/index.html')
+
+@app.route("/page2")
+def page2():
+    print(f"request.cookies: {request.cookies}")
+    return render_template('/page2.html')
 
 @app.route("/testget")
 def test_get():

@@ -2,12 +2,7 @@
 //const host = "http://192.168.0.100:8000/"
 //const host = 'http://192.168.33.39:8000/';
 
-var host = ''
-if (document.domain.includes('package')){
-	host = 'http://192.168.33.50:8000/'
-}
-
-
+var host = 'http://127.0.0.1:8000/'
 function testAjax() {
 	$.ajax({
 		type: 'GET',
@@ -71,7 +66,16 @@ function getAllCookie() {
 }
 
 $(document).ready(function() {
-	testAjax();
-	setCookie();
-	$("#request").html('ajax请求地址: ' + host)
+	if (window.KKJSBridge != null){
+		window.KKJSBridge.call('EvnModule', 'getRequestHost', {}, function(res) {
+			host = "http://" + res.host + "/"
+			testAjax();
+			setCookie();
+			$("#request").html('ajax请求地址: ' + host)
+		});
+	}else {
+		testAjax();
+		setCookie();
+		$("#request").html('ajax请求地址: ' + host)
+	}
 });

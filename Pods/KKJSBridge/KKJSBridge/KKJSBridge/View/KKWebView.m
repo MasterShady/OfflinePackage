@@ -46,12 +46,12 @@
  【COOKIE 1】同步首次请求的 cookie
  */
 - (nullable WKNavigation *)loadRequest:(NSURLRequest *)request {
-    if (request.URL.scheme.length > 0) {
-        [self syncAjaxCookie];
-        NSMutableURLRequest *requestWithCookie = request.mutableCopy;
-        [KKWebViewCookieManager syncRequestCookie:requestWithCookie];
-        return [super loadRequest:requestWithCookie];
-    }
+//    if (request.URL.scheme.length > 0) {
+//        [self syncAjaxCookie];
+//        NSMutableURLRequest *requestWithCookie = request.mutableCopy;
+//        [KKWebViewCookieManager syncRequestCookie:requestWithCookie];
+//        return [super loadRequest:requestWithCookie];
+//    }
     
     return [super loadRequest:request];
 }
@@ -75,6 +75,7 @@
      【COOKIE 3】对服务器端重定向(302)/浏览器重定向(a标签[包括 target="_blank"]) 进行同步 cookie 处理。
      由于所有的跳转都会是 NSMutableURLRequest 类型，同时也无法单独区分出 302 服务器端重定向跳转，所以这里统一对服务器端重定向(302)/浏览器重定向(a标签[包括 target="_blank"])进行同步 cookie 处理。
      */
+    NSLog(@"~~ decidePolicyForNavigationAction: %@",navigationAction.request.URL);
     if ([navigationAction.request isKindOfClass:NSMutableURLRequest.class]) {
         [KKWebViewCookieManager syncRequestCookie:(NSMutableURLRequest *)navigationAction.request];
     }
@@ -90,6 +91,7 @@
 // 2、在收到响应后，决定是否跳转
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
     // iOS 12 之后，响应头里 Set-Cookie 不再返回。 所以这里针对系统版本做区分处理。
+    NSLog(@"~~ decidePolicyForNavigationResponse: %@",navigationResponse.response.URL);
     if (@available(iOS 11.0, *)) {
         // 【COOKIE 4】同步 WKWebView cookie 到 NSHTTPCookieStorage。
         [KKWebViewCookieManager copyWKHTTPCookieStoreToNSHTTPCookieStorageForWebViewOniOS11:webView withCompletion:nil];

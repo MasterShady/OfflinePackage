@@ -57,8 +57,6 @@ static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleReq
     [NSURLProtocol setProperty:@YES forKey:kOfflinePackageDidHandleRequest inRequest:mutableReqeust];
     
     
-    
-    
     if ([self.request.URL.host containsString:@".package"]) {
         //本地
         NSString *packageId = [self.request.URL.host componentsSeparatedByString:@"."][0];
@@ -66,9 +64,12 @@ static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleReq
         if (self.request.URL.pathExtension.length > 0) {
             relativePath = self.request.URL.relativePath;
         }else{
-            relativePath = @"index.html";
+            if([self.request.URL.lastPathComponent isEqualToString:@"/"]){
+                relativePath = @"index.html";
+            }else{
+                relativePath = [NSString stringWithFormat:@"%@.html",self.request.URL.lastPathComponent];
+            }
         }
-
         NSString *filePath = [@[
             NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],
             @"unzipFiles",

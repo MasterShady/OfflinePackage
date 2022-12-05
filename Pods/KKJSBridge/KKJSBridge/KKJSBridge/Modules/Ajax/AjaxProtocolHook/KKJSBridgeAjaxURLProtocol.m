@@ -130,6 +130,33 @@ static NSString * const kKKJSBridgeAjaxResponseHeaderAC = @"Access-Control-Allow
     [self.customTask resume];
 }
 
+
+//- (void)startLoading {
+//    NSMutableURLRequest *mutableReqeust = [[self request] mutableCopy];
+//    NSString *requestId;
+//    if ([mutableReqeust.URL.absoluteString containsString:kRequestId]) {
+//        requestId = [self getRequestId:mutableReqeust.URL.absoluteString];
+//    }
+//
+//    self.requestId = requestId;
+//    self.requestHTTPMethod = mutableReqeust.HTTPMethod;
+//
+//    NSArray *bodySupportMethods = @[@"POST",@"PUT"];
+//
+//    if (mutableReqeust.HTTPMethod.length > 0 && [bodySupportMethods containsObject:mutableReqeust.HTTPMethod]) {
+//        NSDictionary *body = [self getBodyFromRequestId:requestId];
+//        if (body) {
+//            // 从把缓存的 body 设置给 request
+//            [self setBody:bodyReqeust forRequest:mutableReqeust];
+//        }
+//    }
+//
+//    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+//    self.customTask = [session dataTaskWithRequest:mutableReqeust];
+//    [self.customTask resume];
+//}
+
+
 - (void)stopLoading {
     if (self.customTask != nil) {
         [self.customTask  cancel];

@@ -56,14 +56,14 @@ static id<KKJSBridgeAjaxDelegateManager> globalAjaxDelegateManager;
     _enableCookieSetHook = enableCookieSetHook;
     
     NSString *script = [NSString stringWithFormat:@"window.KKJSBridgeConfig.enableCookieSetHook(%@)", [NSNumber numberWithBool:enableCookieSetHook]];
-    [self evaluateConfigScript:script];
+    //[self evaluateConfigScript:script];
 }
 
 - (void)setEnableCookieGetHook:(BOOL)enableCookieGetHook {
     _enableCookieGetHook = enableCookieGetHook;
     
     NSString *script = [NSString stringWithFormat:@"window.KKJSBridgeConfig.enableCookieGetHook(%@)", [NSNumber numberWithBool:enableCookieGetHook]];
-    [self evaluateConfigScript:script];
+    //[self evaluateConfigScript:script];
 }
 
 #pragma mark - public static

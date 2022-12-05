@@ -10,6 +10,7 @@
 #import <WebKit/WebKit.h>
 #import <KKJSBridge/KKJSBridge.h>
 #import <AFNetworking/AFNetworking.h>
+#import "EvnModule.h"
 
 @interface OfflinePackageController ()<WKNavigationDelegate>
 
@@ -79,7 +80,7 @@
     
     _webView.navigationDelegate = self;
     _jsBridgeEngine = [KKJSBridgeEngine bridgeForWebView:self.webView];
-    _jsBridgeEngine.config.enableAjaxHook = NO;
+    _jsBridgeEngine.config.enableAjaxHook = YES;
     _jsBridgeEngine.bridgeReadyCallback = ^(KKJSBridgeEngine * _Nonnull engine) {
         NSLog(@"~~ bridgeReadyCallback");
         NSString *event = @"customEvent";
@@ -91,9 +92,13 @@
     };
     
     //[self compatibleWebViewJavascriptBridge];
-    //[self registerModule];
+    [self registerModule];
     [self loadRequest];
     
+}
+
+- (void)registerModule{
+    [self.jsBridgeEngine.moduleRegister registerModuleClass:EvnModule.class withContext:self.webView];
 }
 
 
@@ -106,7 +111,10 @@
     self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"<返回" style:UIBarButtonItemStyleDone target:self action:@selector(onClickBack)];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"刷新" style:UIBarButtonItemStyleDone target:self action:@selector(onRefresh)];
+    self.navigationItem.rightBarButtonItems = @[
+        [[UIBarButtonItem alloc] initWithTitle:@"trap" style:UIBarButtonItemStyleDone target:self action:@selector(onTrap)],
+        [[UIBarButtonItem alloc] initWithTitle:@"刷新" style:UIBarButtonItemStyleDone target:self action:@selector(onRefresh)],
+    ];
     
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.webView];
@@ -120,6 +128,18 @@
     [constraints addObject:[NSLayoutConstraint constraintWithItem:self.webView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view.safeAreaLayoutGuide attribute:NSLayoutAttributeTop multiplier:1 constant:0]];
     [self.view addConstraints:constraints];
     
+}
+
+- (void)onTrap{
+    NSLog(@"===========ns cookies start==========\n");
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"MM/dd HH:mm"];
+    for (NSHTTPCookie *cookie in [EvnModule allNSHTTPCookies]) {
+        NSLog(@"%@=%@ \n date:%@ \n domain:%@",cookie.name,cookie.value, [dateFormat stringFromDate:cookie.expiresDate],cookie.domain);
+    }
+    NSLog(@"===========ns cookies end==========\n");
+    
+    [EvnModule printAllWKCookieIfCould:self.webView];
 }
 
 - (void)onClickBack {
@@ -149,6 +169,13 @@
 
 + (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request callbackDelegate:(NSObject<KKJSBridgeAjaxDelegate> *)callbackDelegate {
     return [[self ajaxSesstionManager] dataTaskWithRequest:request uploadProgress:nil downloadProgress:nil completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:[httpResponse allHeaderFields] forURL:httpResponse.URL];
+            for (NSHTTPCookie *cookie in cookies) {
+                [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            }
+        }
         // 处理响应数据
         [callbackDelegate JSBridgeAjax:callbackDelegate didReceiveResponse:response];
         if ([responseObject isKindOfClass:NSData.class]) {
