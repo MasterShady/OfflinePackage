@@ -10,9 +10,6 @@
     <script src="https://code.jquery.com/jquery-3.6.1.js"
       integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
     <script src="static/app.js"></script>
-
-
-
   </head>
   <body>
     <p id="domain">当前地址</p>
@@ -21,10 +18,19 @@
     <p id="p2">P2</p>
     <a href="/page2">goToPage2</a>
     <button id="ck">get Server cookie</button>
+    <button id="upload">upload image</button>
+    <img id="image" src="static/images/curry.jpeg" alt="111" width="100px">
   </body>
   <script>
     $("#ck").on("click", function () {
       testServerCookie()
+    });
+
+    $("#upload").on("click", function () {
+      getImage()
+      // getImage(function (data){
+      //   print(data)
+      // })
     });
 
     $("#domain").html('当前地址: ' + document.domain)
