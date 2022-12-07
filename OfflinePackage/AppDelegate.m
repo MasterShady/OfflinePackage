@@ -19,7 +19,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    [PackageManager installAllPackages];
+//    [PackageManager :@"app" completedHandler:^(PackageInfo * _Nonnull) {
+//
+//    }];
     
     
 

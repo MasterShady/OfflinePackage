@@ -10,7 +10,7 @@
 #import <WebKit/WebKit.h>
 #import <KKJSBridge/KKJSBridge.h>
 #import <AFNetworking/AFNetworking.h>
-#import "EvnModule.h"
+#import "EnvModule.h"
 
 @interface OfflinePackageController ()<WKNavigationDelegate>
 
@@ -98,7 +98,7 @@
 }
 
 - (void)registerModule{
-    [self.jsBridgeEngine.moduleRegister registerModuleClass:EvnModule.class withContext:self.webView];
+    [self.jsBridgeEngine.moduleRegister registerModuleClass:EnvModule.class withContext:self.webView];
 }
 
 
@@ -134,12 +134,12 @@
     NSLog(@"===========ns cookies start==========\n");
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
     [dateFormat setDateFormat:@"MM/dd HH:mm"];
-    for (NSHTTPCookie *cookie in [EvnModule allNSHTTPCookies]) {
+    for (NSHTTPCookie *cookie in [EnvModule allNSHTTPCookies]) {
         NSLog(@"%@=%@ \n date:%@ \n domain:%@",cookie.name,cookie.value, [dateFormat stringFromDate:cookie.expiresDate],cookie.domain);
     }
     NSLog(@"===========ns cookies end==========\n");
     
-    [EvnModule printAllWKCookieIfCould:self.webView];
+    [EnvModule printAllWKCookieIfCould:self.webView];
 }
 
 - (void)onClickBack {

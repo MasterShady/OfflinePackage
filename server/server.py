@@ -1,7 +1,8 @@
 import datetime
+import os
 
 import flask
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask import render_template
 from datetime import timedelta
@@ -9,6 +10,25 @@ from flask import url_for, redirect
 
 app = Flask(__name__, static_url_path='/static', static_folder='templates/static')
 CORS(app)
+
+PACKAGEINFO = {
+    "app":{
+        "version":"3",
+        "path":"http:127.0.0.1:8000/download/app.zip"
+    },
+    "app2":{
+        "version":"1",
+        "path":"/download/app.zip"
+    }
+}
+
+
+@app.route('/getNewestPackage',methods=["POST"])
+def getPackage():
+    req = request.get_json()
+    packageId = req['packageId']
+    rsp = PACKAGEINFO[packageId]
+    return rsp
 
 @app.route("/redirct")
 def redirct():
@@ -47,6 +67,13 @@ def test_post():
 @app.errorhandler(Exception)
 def handle_exception(err):
     print(err)
+
+
+@app.route("/download/<filename>", methods=['GET'])
+def download_file(filename):
+    # 需要知道2个参数, 第1个参数是本地目录的path, 第2个参数是文件名(带扩展名)
+    directory = os.getcwd()  # 假设在当前目录
+    return send_from_directory("packages", filename, as_attachment=True)
 
 
 # #设置允许的文件格式

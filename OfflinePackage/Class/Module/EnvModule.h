@@ -12,7 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-@interface EvnModule : NSObject <KKJSBridgeModule>
+@interface EnvModule : NSObject <KKJSBridgeModule>
 
 + (NSString *)requestHost;
 

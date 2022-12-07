@@ -7,6 +7,7 @@
 
 #import "OfflinePackageURLProtocol.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "PackageManager.h"
 
 static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleRequest";
 
@@ -33,6 +34,9 @@ static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleReq
         if ([NSURLProtocol propertyForKey:kOfflinePackageDidHandleRequest inRequest:request]) {
             return NO;
         }
+//        if ([NSURLProtocol propertyForKey:kRequestFromNavtie inRequest:request]) {
+//            return NO;
+//        }
     }
     
     return YES;
@@ -56,7 +60,6 @@ static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleReq
     // 标示改request已经处理过了，防止无限循环
     [NSURLProtocol setProperty:@YES forKey:kOfflinePackageDidHandleRequest inRequest:mutableReqeust];
     
-    
     if ([self.request.URL.host containsString:@".package"]) {
         //本地
         NSString *packageId = [self.request.URL.host componentsSeparatedByString:@"."][0];
@@ -70,13 +73,15 @@ static NSString *kOfflinePackageDidHandleRequest = @"kOfflinePackageDidHandleReq
                 relativePath = [NSString stringWithFormat:@"%@.html",self.request.URL.lastPathComponent];
             }
         }
+        NSString *version = [PackageManager currentVersionOfPackage:packageId];
         NSString *filePath = [@[
             NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],
             @"unzipFiles",
             packageId,
+            version,
             relativePath
         ] componentsJoinedByString:@"/"];
-        //mutableReqeust.URL = [NSURL fileURLWithPath:indexPath];
+
         NSData *data = [NSData dataWithContentsOfFile:filePath];;
         NSURLResponse *res = [[NSURLResponse alloc] initWithURL:self.request.URL MIMEType:[self getMimeTypeWithFilePath:filePath] expectedContentLength:data.length textEncodingName:nil];
         [self.client URLProtocol:self didReceiveResponse:res cacheStoragePolicy:NSURLCacheStorageNotAllowed];

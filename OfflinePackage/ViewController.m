@@ -9,9 +9,10 @@
 #import <WebKit/WebKit.h>
 #import "OfflinePackageController.h"
 #import <AFNetworking/AFNetworking.h>
-#import "EvnModule.h"
+#import "EnvModule.h"
+#import "PackageManager.h"
 
-static NSString *appId = @"v10";
+static NSString *appId = @"app";
 
 @interface ViewController ()<WKNavigationDelegate,UITextFieldDelegate>
 
@@ -38,7 +39,7 @@ static NSString *appId = @"v10";
         label;
     });
     
-    tf.text = [EvnModule requestHost];
+    tf.text = [EnvModule requestHost];
     tf.delegate = self;
     tf.leftViewMode = UITextFieldViewModeAlways;
     
@@ -69,6 +70,12 @@ static NSString *appId = @"v10";
     [btn3 setTitle:@"User Make Cookie" forState:UIControlStateNormal];
     [btn3 addTarget:self action:@selector(makeCookie:) forControlEvents:UIControlEventTouchUpInside];
   
+    
+    UIButton *btn4 = [[UIButton alloc] initWithFrame:CGRectMake(0, 600, 375, 40)];
+    [self.view addSubview:btn4];
+    btn4.backgroundColor = UIColor.greenColor;
+    [btn4 setTitle:@"Update Package" forState:UIControlStateNormal];
+    [btn4 addTarget:self action:@selector(updatePackage) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)makeCookie:(UIButton *)sender{
@@ -86,11 +93,11 @@ static NSString *appId = @"v10";
 
 - (void)textFieldDidEndEditing:(UITextField *)textField{
     if (textField.text.length) {
-        [EvnModule setRequestHost:textField.text];
+        [EnvModule setRequestHost:textField.text];
         [textField endEditing:YES];
         //return YES;
     }
-    textField.text = [EvnModule requestHost];
+    textField.text = [EnvModule requestHost];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
@@ -104,6 +111,13 @@ static NSString *appId = @"v10";
     return NO;
 }
 
+- (void)updatePackage{
+    [PackageManager getNewestPackage:@"app" completedHandler:^(PackageInfo * _Nonnull) {
+        
+    }];
+    
+}
+
 - (void)loadPackage{
     OfflinePackageController *vc = [OfflinePackageController controllerWithPackageId:appId];
     [self.navigationController pushViewController:vc animated:YES];
@@ -111,7 +125,7 @@ static NSString *appId = @"v10";
 
 - (void)loadWebPage{
     
-    OfflinePackageController *vc = [[OfflinePackageController alloc] initWithUrl:[NSString stringWithFormat:@"http://%@/",[EvnModule requestHost]]];
+    OfflinePackageController *vc = [[OfflinePackageController alloc] initWithUrl:[NSString stringWithFormat:@"http://%@/",[EnvModule requestHost]]];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
@@ -120,7 +134,7 @@ static NSString *appId = @"v10";
         _manager = [AFHTTPSessionManager manager];
     }
     
-    [_manager GET:[NSString stringWithFormat:@"http://%@/testCookie",[EvnModule requestHost]] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [_manager GET:[NSString stringWithFormat:@"http://%@/testCookie",[EnvModule requestHost]] parameters:nil headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
         NSLog(@"~~ %@",responseObject);
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {

@@ -8,7 +8,7 @@
 
 #import "UIViewController+SYAdd.h"
 #import <objc/runtime.h>
-#import "UIWindow+JKHierarchy.h"
+//#import "UIWindow+JKHierarchy.h"
 
 @implementation UIViewController (SYAdd)
 
@@ -105,7 +105,7 @@ void * popActionKey;
 - (void)getControllerInNavPopByByClsName:(NSString *)clsName result:(void(^)(UIViewController *))result{
     __block UIViewController *desController;
     [self.navigationController.viewControllers enumerateObjectsUsingBlock:^(__kindof UIViewController * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj.className isEqualToString:clsName]) {
+        if ([NSStringFromClass(obj.class) isEqualToString:clsName]) {
             desController = obj;
             *stop = YES;
         }
@@ -130,7 +130,7 @@ void * popActionKey;
             continue;
         }
         [blacklist enumerateObjectsUsingBlock:^(NSString *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj isEqualToString:nextVc.className]) {
+            if ([obj isEqualToString:NSStringFromClass(nextVc.class)]) {
                 inBlackList = YES;
                 *stop = YES;
             }
